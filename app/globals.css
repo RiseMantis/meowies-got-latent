@@ -1,19 +1,7 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f15d5d;
-  --foreground: #926d6d;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #b865e2;
-    --foreground: #c99393;
-  }
-}
-
 body {
-  background: var(--background);
+  background: blueviolet;
   font-family: Arial, Helvetica, sans-serif;
   padding-top: 4rem;
   padding-left: 2rem;
@@ -42,6 +30,8 @@ body {
   border-radius: 10px;
 
   animation: pop-up 1.5s ease-in forwards;
+
+  color: lightblue;
 
   height: clamp(100px, 40vw, 300px);
   width: clamp(100px, 40vw, 300px);
