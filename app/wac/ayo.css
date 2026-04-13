@@ -1,10 +1,54 @@
 body{
   padding: 0px;
   background: none;
+  overflow: hidden;
 }
 
 #myMap{
   height: 100vh;
   width: 100vw;
   outline: 2px solid black;
+  position: relative;
+}
+
+#search-box{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: clamp(45px, 7vh, 300px);
+
+  width: 70vw;
+  min-width: 255px;
+
+  outline: 2px solid rgb(144, 100, 255);
+  border-radius: 40px;
+  background-color: rgba(103, 141, 210, 0.6);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  position: absolute;
+  top: 20px;
+  z-index: 1000;
+  padding: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#search-inp{
+  outline: none;
+  border: none;
+}
+
+#search-btn{
+  cursor: pointer;
+
+  border-radius: 40px;
+  width: 40px;
+  height: 40px;
+  outline: 2px solid rgb(144, 100, 255);
+  background-image: url('/pixil-frame-0.png');
+  background-color: rgba(255, 255, 255, 0.5);
+  background-size:contain;
+  background-position: 2px 2px;
+  background-repeat: no-repeat;
 }

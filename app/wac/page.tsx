@@ -1,14 +1,35 @@
 'use client'
 
 import 'leaflet/dist/leaflet.css'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './ayo.css';
 
-import L from 'leaflet';
+function SearchBar(){
+  const [search, setSearch] = useState("");
+
+  const handleSearch = () => {
+    console.log(search);
+  }
+
+  return(
+    <div id='search-box'>
+        <input
+          type='text'
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder='Search your next Spot'
+          id='search-inp'
+        />
+        <button onClick={handleSearch} id='search-btn'></button>
+    </div>
+  )
+}
 
 function WnC(){
 
   useEffect(() => {
+    const L = require('leaflet');
+
     const myMap = L.map("myMap", {
       center: [0, 0],
       zoom: 5,
@@ -20,6 +41,10 @@ function WnC(){
         attribution: '© OpenStreetMap contributors'
     }).addTo(myMap)
 
+    L.marker([1,1]).addTo(myMap)
+    .bindPopup("Pop-up at cords 1, 1. <p>this is said to be customizable</p>.")
+    .openPopup()
+
     setTimeout(() => {
       myMap.invalidateSize()
     }, 1000)
@@ -28,14 +53,10 @@ function WnC(){
       myMap.remove()
     }
   }, []);
-  
 
   return(
     <main>
-      <div>
-        yoyoy
-      </div>
-
+      <SearchBar />
       <div id="myMap">
 
       </div>
