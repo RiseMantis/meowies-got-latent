@@ -2,6 +2,7 @@ body{
   padding: 0px;
   background: none;
   overflow: hidden;
+  background: rgb(220, 183, 255);
 }
 
 #myMap{
@@ -21,7 +22,7 @@ body{
   width: 70vw;
   min-width: 255px;
 
-  outline: 2px solid rgb(144, 100, 255);
+  outline: 2px solid rgb(132, 108, 192);
   border-radius: 40px;
   background-color: rgba(103, 141, 210, 0.6);
   -webkit-backdrop-filter: blur(5px);
@@ -32,23 +33,38 @@ body{
   padding: 6px;
   left: 50%;
   transform: translateX(-50%);
+
+  box-shadow: 0px 0px 5px rgb(64, 73, 248);
 }
 
 #search-inp{
   outline: none;
   border: none;
+  font-size: 16px;      
+  padding: 12px 16px;
+  min-height: 48px;
 }
+
+
 
 #search-btn{
   cursor: pointer;
 
   border-radius: 40px;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
+  min-width: 48px;
+  min-height: 48px;
   outline: 2px solid rgb(144, 100, 255);
   background-image: url('/pixil-frame-0.png');
   background-color: rgba(255, 255, 255, 0.5);
   background-size:contain;
   background-position: 2px 2px;
   background-repeat: no-repeat;
+
+  transition: all 0.5s ease-out;
+}
+
+#search-btn:active{
+  transform: scale(0.9);
 }
