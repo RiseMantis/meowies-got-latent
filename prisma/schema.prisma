@@ -15,4 +15,35 @@ model Location{
   lon Float
   placeId String? @unique
   createdAt DateTime @default(now())
+
+  reports SensoryReport[]
+}
+
+model User{
+  id String @id @default(cuid())
+  name String @unique
+  email String
+  createdAt DateTime @default(now())
+  reports SensoryReport[]
+}
+
+model SensoryReport{
+  id String @id @default(cuid())
+  
+  createdAt DateTime @default(now())
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  locationId String
+  location Location @relation(fields: [locationId], references: [id])
+
+  soundTag String
+  lightTag String
+  aromaTag String
+  crowdTag String
+
+
+
+  confirms Int @default(0)
 }
