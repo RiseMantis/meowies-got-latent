@@ -1,9 +1,9 @@
 'use client'
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import { useMapStore } from '@/store/mapStore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import L, { map } from 'leaflet'
+import L, { LatLngExpression, map } from 'leaflet'
 import './ayo.css'
 
 function GoToLocation(){
@@ -34,14 +34,16 @@ function MapClickHandler() {
 }
 
 function Map() {
+  const [mapCenter, setMapCenter] = useState<LatLngExpression>([19.076, 72.877])
+  const [mapZoom, setMapZoom] = useState(10);
   const searchResults = useMapStore((s) => s.searchResults);
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
 
   return (
     <>
       <MapContainer
-        center={[19.076, 72.877]}
-        zoom={10}
+        center={mapCenter}
+        zoom={mapZoom}
         id='myMap'
         
         zoomControl={false}
