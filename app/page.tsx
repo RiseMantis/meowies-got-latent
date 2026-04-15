@@ -1,6 +1,7 @@
 import './globals.css'
 import Link from 'next/link';
 import {Andika} from "next/font/google";
+import { LoginGithub } from './components/loginButton';
 const andika = Andika({
   weight: ['700'],
   subsets: ['latin'],
@@ -20,6 +21,8 @@ export default function Home() {
           
         </div>
       </Link>
+
+      <LoginGithub/>
     </main>
   );
 }
