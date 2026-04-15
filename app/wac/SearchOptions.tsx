@@ -12,8 +12,8 @@ export function SearchOptions({ data }) {
           className='search-item'
           onClick={() => setSelectedLocation(place)}  
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{place.name}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+            <span>{place.name}:</span>
             <span>{place.address}</span>
           </div>
         </div>

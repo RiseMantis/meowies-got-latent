@@ -16,13 +16,15 @@ export default function Home() {
         Walks&Chills
       </h1>
 
-      <Link href="/wac">
-        <div id="go-ahead">
-          
-        </div>
-      </Link>
+      <div id='btn-cont'>
+        <Link href="/wac">
+          <div id="go-ahead">
+            
+          </div>
+        </Link>
 
-      <LoginGithub/>
+        <LoginGithub/>
+      </div>
     </main>
   );
 }

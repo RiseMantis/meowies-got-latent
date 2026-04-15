@@ -41,7 +41,7 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
 
-  animation: pop-up 1.5s ease-in forwards;
+  animation: grow-up 1.5s ease-in forwards;
 
   color: lightblue;
 
@@ -52,18 +52,18 @@ body {
   transition: all 1s ease-in;
 }
 
-@keyframes rotate {
+@keyframes grow-up {
   from{
-    transform: rotate(0deg);
+    transform: rotate(-45deg) scale(0);
   }
   to{
-    transform: rotate(-45deg);
+    transform: rotate(-45deg) scale(1);
   }
 }
 
 @keyframes pop-up {
   from{
-    transform: rotate(0deg) scale(0.05);
+    transform: rotate(0deg) scale(0);
   }
   to{
     transform: rotate(-45deg) scale(1);
@@ -82,24 +82,39 @@ body {
   }
 }
 
+#btn-cont{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
 #home-container{
   display: flex;
   flex-direction: column;
   align-items: center;
   border: none;
-  justify-content: space-evenly;
-  gap: 20px;
-  height: 70vh;
+  justify-content: space-around;
+  gap: 25px;
+  height: 80vh;
 }
 
 #github-btn{
   display: flex;
-  min-height: 60px;
+  flex-direction: column;
   align-items: center;
-  width: clamp(100px, 20vw, 300px);
+
+  width: clamp(50px, 15vw, 150px);
+  height: clamp(50px, 15vw, 150px);
+
   flex-direction: column;
   padding: 10px;
-  /* clip-path: polygon(0 50%, 50% 100%, 100% 50%, 0 50%, 100% 100%); */
+
+  justify-content: space-between;
+
+  transform: rotate(45deg);
+  overflow: visible;
   cursor: pointer;
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.4);
@@ -109,8 +124,15 @@ body {
 
 #gitlogo{
   background-image: url('../public/github-logo.png');
-  min-height: 50px;
-  min-width: 50px;
+}
+
+#google-logo{
+  background-image: url('../public/google-logo.jpg');
+}
+
+#google-logo, #gitlogo{
+  min-height: 25px;
+  min-width: 25px;
   cursor: pointer;
   background-repeat: no-repeat;
   background-size: contain;
@@ -118,13 +140,25 @@ body {
 
 #login-btn{
   display: flex;
-  width: clamp(200px, 60vw, 600px);
+  height: clamp(100px, 20vw, 150px);
+  width: clamp(300px, 40vw,700px);
   justify-content: space-between;
+}
+
+.btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: clamp(50px, 15vw, 150px);
+  width: clamp(50px, 15vw, 150px);
+  transform: rotate(45deg); 
+  font-size: 75%;
 }
 
 @keyframes pop-up-2 {
   from{
-    transform: rotate(0deg) scale(0.05);
+    transform: rotate(0deg) scale(0);
   }
   to{
     transform: rotate(45deg) scale(1);

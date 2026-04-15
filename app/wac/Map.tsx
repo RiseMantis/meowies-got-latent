@@ -1,12 +1,23 @@
-'use client'
+'use client';
+
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import { useMapStore } from '@/store/mapStore'
 import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression, map } from 'leaflet'
 import './ayo.css'
+import { error } from 'console'
 
-function GoToLocation(){
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'
+
+if (typeof window !== "undefined") {
+  // @ts-ignore
+  window.L = L;
+}
+
+import 'leaflet-routing-machine';
+
+function GoToLocation({onMapClick}: { onMapClick: (latlng: L.LatLng) => void }){
   const map = useMap()
   const selectedLocation = useMapStore((s) => s.selectedLocation)
 
@@ -15,19 +26,68 @@ function GoToLocation(){
       map.flyTo([selectedLocation.lat, selectedLocation.lon], 16, {
         duration: 1.5
       })
+      onMapClick(L.latLng(selectedLocation.lat, selectedLocation.lon))
     }
   }, [selectedLocation, map])
 
   return null
 }
 
-function MapClickHandler() {
+const getLocation = () => {
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const {latitude, longitude} = position.coords;
+
+      console.log(`User's Coords: ${latitude}, ${longitude}`)
+    },
+    (error) => {
+      console.error(`Error in getting location: ${error.message}`)
+    }
+    )
+    return navigator.geolocation
+  }
+  else{
+    console.log("Geolocation not supported");
+    return null
+  }
+}
+
+function DoRouting({start, end}: { start: L.LatLng | null, end: L.LatLng | null}){
+  const map = useMap();
+
+  useEffect(() => {
+    if(!map || !start || !end){
+      return;
+    }
+
+    const routingControl = (L as any).Routing.control({
+      waypoints: [start, end],
+      routeWhileDragging: true,
+      position: 'bottomleft',
+      lineOptions: {
+        styles: [
+          {color: 'blue', weight: 4}
+        ]
+      }
+    }).addTo(map)
+
+    return () => {
+      if(map) map.removeControl(routingControl);
+    }
+  }, [map, start, end])
+
+  return null;
+}
+
+function MapClickHandler({onMapClick}: { onMapClick: (latlng: L.LatLng) => void }) {
   useMapEvents({
     click: (e) => {
       L.popup()
         .setLatLng(e.latlng)
         .setContent(`You clicked at ${e.latlng.toString()}`)
-        .openOn(e.target); // e.target is the map instance
+        .openOn(e.target);
+      
+      onMapClick(e.latlng)
     },
   })
   return null
@@ -38,6 +98,28 @@ function Map() {
   const [mapZoom, setMapZoom] = useState(10);
   const searchResults = useMapStore((s) => s.searchResults);
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
+
+  const [userLocation, setUserLocation] = useState<L.LatLng | null>(null)
+  const [routeEnd, setRouteEnd] = useState<L.LatLng | null>(null)
+
+  useEffect(() => {
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation(L.latLng(latitude, longitude))
+        console.log("got your cords")
+      },
+      (error) => {
+        console.error(`Error on User Location: ${error}`)
+      }
+      )
+    }
+  }, [])
+
+  const handleMapClick = (latlng: L.LatLng) => {
+    setRouteEnd(latlng)
+    console.log("Routing...")
+  }
 
   return (
     <>
@@ -53,10 +135,12 @@ function Map() {
           attribution='© OpenStreetMap contributors'
         />
 
-        <GoToLocation />
-        <MapClickHandler />
+        <GoToLocation onMapClick={handleMapClick}/>
+        <MapClickHandler onMapClick={handleMapClick}/>
 
-        {searchResults.map((loc) => (
+        <DoRouting start={userLocation} end={routeEnd} />
+
+        {searchResults.map((loc: any) => (
           <Marker
             key={loc.id}
             position={[loc.lat, loc.lon]}
