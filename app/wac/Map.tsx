@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression, map } from 'leaflet'
 import './ayo.css'
-import { error } from 'console'
 
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'
 

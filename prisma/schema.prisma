@@ -16,6 +16,16 @@ model Location{
   placeId String? @unique
   createdAt DateTime @default(now())
 
+  isVerified  Boolean @default(false) // True if registered by an owner
+  ownerId     String? 
+  owner       User?    @relation("RegisteredLocations", fields: [ownerId], references: [id])
+
+  // defined by the owner
+  soundTag    String?
+  lightTag    String?
+  aromaTag    String?
+  crowdTag    String?  
+
   reports SensoryReport[]
 }
 
@@ -25,8 +35,10 @@ model User{
   email String
   createdAt DateTime @default(now())
   reports SensoryReport[]
+  registeredLocations Location[] @relation("RegisteredLocations")
 }
 
+// defined by other users/visitors
 model SensoryReport{
   id String @id @default(cuid())
   
@@ -42,8 +54,6 @@ model SensoryReport{
   lightTag String
   aromaTag String
   crowdTag String
-
-
 
   confirms Int @default(0)
 }
