@@ -64,7 +64,10 @@ function SearchBar(){
           <input
             type='text'
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              handleSearch(e);
+              }}
             placeholder='Search your next Spot'
             id='search-inp'
 
@@ -83,7 +86,7 @@ function SearchBar(){
 
       <div>
         {
-          (searchData.length !== 0) &&
+          (searchData.length !== 0) && (search.length !== 0) &&
           (
             <SearchOptions data={searchData}/>
           )

@@ -1,3 +1,6 @@
+@import "leaflet/dist/leaflet.css";
+@import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+
 body{
   padding: 0px;
   background: none;
@@ -56,8 +59,8 @@ body{
   outline: 2px solid rgb(144, 100, 255);
   background-image: url('/pixil-frame-0.png');
   background-color: rgba(255, 255, 255, 0.5);
-  background-size:contain;
-  background-position: 2px 2px;
+  background-size:75%;
+  background-position: 5px 5px;
   background-repeat: no-repeat;
 
   transition: tranform 500ms ease, background-color 1s ease;
@@ -74,23 +77,27 @@ body{
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  outline: 2px solid black;
   padding:2px;
   z-index: 1000;
 
-  background-color: rgba(159, 159, 255, 0.7);
-
-  gap: 3px;
+  background-color: rgba(0, 0, 0, 0.325);
 
   width: fit-content;
   min-width: 200px;
+  transition: gap 100ms ease-in;
+}
+
+#search-ops:hover{
+  gap: 2px;
 }
 
 .search-item{
   display: flex;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 2px;
   padding-left: 8px;
+  background-color: rgba(159, 159, 255, 0.7);
+  outline: 1px solid black;
 
   cursor: pointer;
 

@@ -17,14 +17,14 @@ model Location{
   createdAt DateTime @default(now())
 
   isVerified  Boolean @default(false) // True if registered by an owner
-  ownerId     String? 
+  ownerId     String?
   owner       User?    @relation("RegisteredLocations", fields: [ownerId], references: [id])
 
   // defined by the owner
   soundTag    String?
   lightTag    String?
   aromaTag    String?
-  crowdTag    String?  
+  crowdTag    String?
 
   reports SensoryReport[]
 }
