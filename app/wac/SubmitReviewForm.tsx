@@ -68,16 +68,16 @@ export default function SubmitReviewForm({ locationId, onSuccess, onCancel }: Su
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/80 backdrop-blur-md p-5 rounded-2xl border border-indigo-100 shadow-sm mt-4"
+      className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md p-5 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm mt-4 transition-colors"
     >
-      <h3 className="text-lg font-semibold text-slate-700 mb-4">Add a Sensory Review</h3>
+      <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-4">Add a Sensory Review</h3>
       
       {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
       <div className="flex flex-col gap-4">
         {tags.map(tag => (
           <div key={tag.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="text-sm font-medium text-slate-600">{tag.label}</span>
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">{tag.label}</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map(star => (
                 <button
@@ -86,7 +86,7 @@ export default function SubmitReviewForm({ locationId, onSuccess, onCancel }: Su
                   className="focus:outline-none transition-transform hover:scale-110"
                 >
                   <Star 
-                    className={`w-6 h-6 ${ratings[tag.key as keyof typeof ratings] >= star ? 'text-yellow-400 fill-yellow-400' : 'text-slate-300'}`} 
+                    className={`w-6 h-6 ${ratings[tag.key as keyof typeof ratings] >= star ? 'text-yellow-400 fill-yellow-400' : 'text-slate-300 dark:text-slate-600'}`} 
                   />
                 </button>
               ))}
@@ -98,7 +98,7 @@ export default function SubmitReviewForm({ locationId, onSuccess, onCancel }: Su
       <div className="flex gap-3 mt-6">
         <button 
           onClick={onCancel}
-          className="flex-1 py-2 rounded-xl text-slate-500 font-medium hover:bg-slate-100 transition-colors"
+          className="flex-1 py-2 rounded-xl text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           disabled={loading}
         >
           Cancel

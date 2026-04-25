@@ -13,23 +13,48 @@ export default function LocationDetailDrawer() {
     <AnimatePresence>
       {selectedLocation && (
         <motion.div
-          initial={{ x: '100%', opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: '100%', opacity: 0 }}
+          initial={{ y: '100%', x: 0, opacity: 0 }} // Mobile default (slide from bottom)
+          animate={{ 
+            y: selectedLocation ? 0 : '100%', 
+            x: 0, 
+            opacity: 1 
+          }}
+          exit={{ y: '100%', opacity: 0 }}
+          // Desktop Overrides: use variants or media queries in the style if needed, 
+          // but for simplicity, we can use the Tailwind classes for positioning:
+          className="
+            /* Mobile: Full width at bottom */
+            fixed bottom-0 left-0 w-full h-[40vh] z-[2000] p-3
+            
+            /* Desktop: Sidebar on the right */
+            md:top-0 md:right-0 md:bottom-auto md:left-auto md:h-full md:w-[400px] md:p-4
+          "
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="fixed top-0 right-0 h-full w-[90vw] md:w-[400px] z-[2000] p-4"
         >
-          {/* Calm, glassmorphic container with soft rounded edges */}
-          <div className="h-full w-full bg-white/60 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(100,116,139,0.1)] rounded-[32px] p-6 flex flex-col gap-6 overflow-y-auto">
+          {/* The Inner Container */}
+          <div className="
+            h-full w-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl 
+            border-t border-white/40 dark:border-slate-800/40 shadow-2xl 
+            
+            /* Mobile: Rounded top only */
+            rounded-t-[32px] 
+            
+            /* Desktop: Full rounded edges */
+            md:rounded-[32px] md:border
+            
+            p-6 flex flex-col gap-6 overflow-y-auto transition-colors
+          ">
+
+            <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-2 md:hidden" />
             
             {/* Header with rounded close button */}
             <div className="flex justify-between items-start">
-              <div className="bg-soft-peach/50 text-terracotta p-3 rounded-2xl shadow-sm">
-                <Heart className="w-8 h-8 text-[#fca5a5]" fill="#fca5a5" />
+              <div className="bg-soft-peach/50 dark:bg-rose-900/30 text-terracotta p-3 rounded-2xl shadow-sm">
+                <Heart className="w-8 h-8 text-[#fca5a5] dark:text-rose-400" fill="#fca5a5" />
               </div>
               <button 
                 onClick={() => setSelectedLocation(null)}
-                className="bg-white/50 hover:bg-white/80 transition-all p-2 rounded-full text-slate-500 shadow-sm"
+                className="bg-white/50 dark:bg-slate-800/50 hover:bg-white/80 dark:hover:bg-slate-700/80 transition-all p-2 rounded-full text-slate-500 dark:text-slate-400 shadow-sm"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -37,11 +62,11 @@ export default function LocationDetailDrawer() {
 
             {/* Content Area */}
             <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-bold text-slate-700 tracking-tight">
+              <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-100 tracking-tight">
                 {selectedLocation.name || 'Friendly Location'}
               </h2>
-              <div className="flex items-start gap-2 text-slate-500 mt-1">
-                <MapPin className="w-5 h-5 shrink-0 mt-0.5 text-[#a5b4fc]" />
+              <div className="flex items-start gap-2 text-slate-500 dark:text-slate-400 mt-1">
+                <MapPin className="w-5 h-5 shrink-0 mt-0.5 text-[#a5b4fc] dark:text-indigo-400" />
                 <p className="text-sm leading-relaxed">{selectedLocation.address}</p>
               </div>
             </div>
@@ -50,13 +75,13 @@ export default function LocationDetailDrawer() {
             <div className="flex gap-3 mt-4">
               <button 
                 onClick={() => setRouteEnd(selectedLocation)}
-                className="flex-1 bg-[#a5b4fc] hover:bg-[#818cf8] text-white py-3 px-4 rounded-2xl font-medium transition-all shadow-md shadow-indigo-100 flex items-center justify-center gap-2"
+                className="flex-1 bg-[#a5b4fc] dark:bg-indigo-600 hover:bg-[#818cf8] dark:hover:bg-indigo-500 text-white py-3 px-4 rounded-2xl font-medium transition-all shadow-md shadow-indigo-100 dark:shadow-none flex items-center justify-center gap-2"
               >
                 <Navigation className="w-5 h-5" />
                 Go Here
               </button>
-              <button className="flex-1 bg-white hover:bg-slate-50 text-slate-600 border border-slate-100 py-3 px-4 rounded-2xl font-medium transition-all shadow-sm flex items-center justify-center gap-2">
-                <Info className="w-5 h-5 text-slate-400" />
+              <button className="flex-1 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 border border-slate-100 dark:border-slate-700 py-3 px-4 rounded-2xl font-medium transition-all shadow-sm flex items-center justify-center gap-2">
+                <Info className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                 Details
               </button>
             </div>
@@ -65,8 +90,8 @@ export default function LocationDetailDrawer() {
             <SensoryReviews locationId={selectedLocation.id} />
 
             {/* Soft decorative elements to reinforce calm/pet theme */}
-            <div className="mt-8 p-5 bg-gradient-to-br from-warm-sand/50 to-soft-peach/30 rounded-3xl border border-white/60">
-              <p className="text-sm text-slate-600 italic text-center">
+            <div className="mt-8 p-5 bg-gradient-to-br from-warm-sand/50 to-soft-peach/30 dark:from-slate-800/50 dark:to-slate-700/30 rounded-3xl border border-white/60 dark:border-slate-600/30 transition-colors">
+              <p className="text-sm text-slate-600 dark:text-slate-400 italic text-center">
                 “A perfect spot for a calm afternoon stroll.” 🐾
               </p>
             </div>

@@ -12,7 +12,7 @@ export function SearchOptions({ data, onSelect }: { data: any[], onSelect: () =>
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="w-full bg-white/90 backdrop-blur-md border border-white/60 rounded-3xl shadow-[0_12px_40px_rgba(100,116,139,0.15)] overflow-hidden"
+        className="w-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-white/60 dark:border-slate-700/60 rounded-3xl shadow-[0_12px_40px_rgba(100,116,139,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5)] overflow-hidden"
       >
         <div className="max-h-[300px] overflow-y-auto w-full p-2 flex flex-col gap-1">
           {data.map((place, index) => (
@@ -41,14 +41,14 @@ export function SearchOptions({ data, onSelect }: { data: any[], onSelect: () =>
 
                 onSelect(); // Tell parent to hide dropdown
               }}
-              className="flex items-center gap-4 w-full p-4 rounded-2xl hover:bg-[#ffedd5]/60 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.98]"
+              className="flex items-center gap-4 w-full p-4 rounded-2xl hover:bg-[#ffedd5]/60 dark:hover:bg-slate-700/60 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.98]"
             >
-              <div className="bg-[#a5b4fc]/20 p-2 rounded-full shrink-0">
+              <div className="bg-[#a5b4fc]/20 dark:bg-indigo-900/30 p-2 rounded-full shrink-0">
                 <MapPin className="w-5 h-5 text-[#818cf8]" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-semibold text-slate-700 truncate">{place.name}</span>
-                <span className="text-sm text-slate-500 truncate">{place.address}</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-200 truncate">{place.name}</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400 truncate">{place.address}</span>
               </div>
             </motion.div>
           ))}

@@ -355,3 +355,98 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* ══════════════════════════════════════════════
+   Dark Mode Overrides
+   ══════════════════════════════════════════════ */
+
+.dark body {
+  background: #0f172a;
+}
+
+.dark .register-page {
+  background: #0f172a;
+}
+
+.dark .register-card {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(71, 85, 105, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.dark .register-header h1 {
+  color: #e2e8f0;
+}
+
+.dark .register-header p {
+  color: #64748b;
+}
+
+.dark .form-label {
+  color: #94a3b8;
+}
+
+.dark .form-input {
+  background: rgba(15, 23, 42, 0.7);
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .form-input::placeholder {
+  color: #475569;
+}
+
+.dark .form-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.dark .pick-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #fda4af;
+}
+
+.dark .pick-btn:hover {
+  background: #263148;
+  border-color: #475569;
+}
+
+.dark .tag-label {
+  color: #64748b;
+}
+
+.dark .tag-select {
+  background-color: rgba(15, 23, 42, 0.7);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .tag-select option {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.dark .tag-select:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+}
+
+.dark .back-link {
+  color: #64748b;
+}
+
+.dark .back-link:hover {
+  color: #94a3b8;
+}
+
+.dark .map-modal-header {
+  background: rgba(15, 23, 42, 0.9);
+  border-bottom-color: rgba(51, 65, 85, 0.5);
+}
+
+.dark .map-modal-header span {
+  color: #e2e8f0;
+}

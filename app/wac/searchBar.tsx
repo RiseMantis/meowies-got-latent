@@ -82,11 +82,11 @@ function SearchBar() {
     <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[90vw] max-w-lg z-[1000] flex flex-col gap-3">
       {/* Search Input Pill */}
       <div 
-        className={`flex items-center justify-between w-full p-2 bg-white/85 backdrop-blur-xl border border-white/60 rounded-full transition-all duration-300 ${
-          isFocused ? 'shadow-[0_8px_32px_rgba(100,116,139,0.2)] scale-[1.02]' : 'shadow-[0_4px_16px_rgba(100,116,139,0.1)]'
+        className={`flex items-center justify-between w-full p-2 bg-white/85 dark:bg-slate-800/85 backdrop-blur-xl border border-white/60 dark:border-slate-700/60 rounded-full transition-all duration-300 ${
+          isFocused ? 'shadow-[0_8px_32px_rgba(100,116,139,0.2)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] scale-[1.02]' : 'shadow-[0_4px_16px_rgba(100,116,139,0.1)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)]'
         }`}
       >
-        <Search className="w-5 h-5 text-slate-400 ml-4 shrink-0" />
+        <Search className="w-5 h-5 text-slate-400 dark:text-slate-500 ml-4 shrink-0" />
         
         <input
           type="text"
@@ -101,7 +101,7 @@ function SearchBar() {
           placeholder="Search your next cozy spot..."
           spellCheck={false}
           autoComplete="off"
-          className="flex-1 min-w-0 bg-transparent border-none outline-none px-3 text-slate-700 font-medium placeholder:text-slate-400 placeholder:font-normal"
+          className="flex-1 min-w-0 bg-transparent border-none outline-none px-3 text-slate-700 dark:text-slate-200 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal"
         />
 
         {search && !loading && (

@@ -103,19 +103,56 @@ function DoRouting({start, end}: { start: L.LatLng | null, end: L.LatLng | null}
   return null;
 }
 
-function MapClickHandler({onMapClick}: { onMapClick: (latlng: L.LatLng) => void }) {
+function MapClickHandler({onMapClick, onNearbyFetch}: { onMapClick: (latlng: L.LatLng) => void, onNearbyFetch: (places: any[]) => void }) {
   useMapEvents({
-    click: (e) => {
-      L.popup()
+    click: async (e) => {
+      const lat = e.latlng.lat;
+      const lon = e.latlng.lng;
+      const shortLat = lat.toFixed(2);
+      const shortLon = lon.toFixed(2);
+
+      // Reverse geocode for a short address
+      let shortAddr = `${shortLat}, ${shortLon}`;
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+          { headers: { 'User-Agent': 'WalksAndChill github.com/RiseMantis' } }
+        );
+        const data = await res.json();
+        if (data.display_name) {
+          const parts = data.display_name.split(',');
+          shortAddr = parts.slice(0, 3).join(',').trim();
+        }
+      } catch (_) {}
+
+      L.popup({ className: 'compact-popup', maxWidth: 200 })
         .setLatLng(e.latlng)
-        .setContent(`You clicked at ${e.latlng.toString()}`)
+        .setContent(`<b style="font-size:12px">${shortAddr}</b><br/><span style="font-size:10px;color:#64748b">${shortLat}, ${shortLon}</span>`)
         .openOn(e.target);
-      
-      onMapClick(e.latlng)
+
+      onMapClick(e.latlng);
+
+      // Fetch nearby locations
+      try {
+        const res = await fetch(`/api/locations/nearby?lat=${lat}&lon=${lon}`);
+        if (res.ok) {
+          const places = await res.json();
+          onNearbyFetch(places);
+        }
+      } catch (err) {
+        console.error('Nearby fetch error:', err);
+      }
     },
   })
   return null
 }
+
+const nearbyIcon = L.divIcon({
+  html: `<div style="font-size: 18px; filter: drop-shadow(0px 2px 4px rgba(100,116,139,0.3)); text-align: center; cursor: pointer;">📍</div>`,
+  className: 'custom-nearby-marker',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
 
 function Map() {
   const [mapCenter, setMapCenter] = useState<LatLngExpression>([19.076, 72.877])
@@ -125,6 +162,7 @@ function Map() {
   const routeEnd = useMapStore((s: any) => s.routeEnd);
 
   const [userLocation, setUserLocation] = useState<L.LatLng | null>(null)
+  const [nearbyPlaces, setNearbyPlaces] = useState<any[]>([]);
 
   useEffect(() => {
     if(navigator.geolocation){
@@ -144,6 +182,10 @@ function Map() {
     // Optional: we leave this to fly to coordinates, but we no longer route automatically
   }
 
+  const handleNearbyFetch = (places: any[]) => {
+    setNearbyPlaces(places);
+  }
+
   return (
     <>
       <MapContainer
@@ -159,7 +201,7 @@ function Map() {
         />
 
         <GoToLocation onMapClick={handleMapClick}/>
-        <MapClickHandler onMapClick={handleMapClick}/>
+        <MapClickHandler onMapClick={handleMapClick} onNearbyFetch={handleNearbyFetch}/>
 
         <DoRouting start={userLocation} end={routeEnd ? L.latLng(routeEnd.lat, routeEnd.lon) : null} />
 
@@ -172,6 +214,22 @@ function Map() {
               click: () => setSelectedLocation(loc),
             }}
           />
+        ))}
+
+        {nearbyPlaces.map((place: any, idx: number) => (
+          <Marker
+            key={`nearby-${place.placeId || place.id || idx}`}
+            position={[place.lat, place.lon]}
+            icon={place.isRegistered ? pawIcon : nearbyIcon}
+            eventHandlers={{
+              click: () => setSelectedLocation(place),
+            }}
+          >
+            <Popup>
+              <b style={{ fontSize: '12px' }}>{place.name}</b>
+              {place.isRegistered && <span style={{ fontSize: '9px', color: '#22c55e', marginLeft: '4px' }}>✓ Registered</span>}
+            </Popup>
+          </Marker>
         ))}
       </MapContainer>
     </>
