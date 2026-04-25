@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@theme {
+  --color-slate-blue: #64748b;
+  --color-muted-sky: #a5b4fc;
+  --color-dusty-teal: #5eead4;
+  --color-soft-peach: #ffedd5;
+  --color-warm-sand: #fef3c7;
+  --color-terracotta: #fca5a5;
+  --color-calm-greige: #f1f0e8;
+}
+
 body {
   background: rgb(220, 183, 255);
   font-family: Arial, Helvetica, sans-serif;
@@ -140,7 +150,7 @@ body {
 
 #login-btn{
   display: flex;
-  height: clamp(100px, 20vw, 150px);
+  height: clamp(80px, 18vw, 135px);
   width: clamp(300px, 40vw,700px);
   justify-content: space-between;
 }
@@ -159,6 +169,15 @@ body {
 @keyframes pop-up-2 {
   from{
     transform: rotate(0deg) scale(0);
+  }
+  to{
+    transform: rotate(45deg) scale(1);
+  }
+}
+
+@keyframes pop-up-3 {
+  from{
+    transform: rotate(45deg) scale(0);
   }
   to{
     transform: rotate(45deg) scale(1);

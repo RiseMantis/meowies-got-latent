@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 const Map = dynamic(() => import('@/app/wac/Map'), {ssr: false})
+import LocationDetailDrawer from '@/app/wac/LocationDetailDrawer';
 
 function WnC(){
   
@@ -15,14 +16,7 @@ function WnC(){
     <main>
       <SearchBar />
       <Map />
-      <div>
-        <Link href="/wac/register-store">
-          <div>
-            Register Store
-          </div>
-        </Link>
-      </div>
-      
+      <LocationDetailDrawer />
     </main>
   )
 }

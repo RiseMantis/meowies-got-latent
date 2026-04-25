@@ -1,15 +1,21 @@
 "use client";
 import { useState } from 'react';
 import './store.css';
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
-import L from 'leaflet'
+import L from 'leaflet';
 import dynamic from 'next/dynamic';
-import { parse } from 'path';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const PickMap = dynamic(() => import('./PickMap'), { 
   ssr: false,
-  loading: () => <div>Loading Map...</div>
+  loading: () => (
+    <div style={{ 
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100%', fontFamily: 'Outfit, sans-serif', color: '#94a3b8'
+    }}>
+      Loading Map...
+    </div>
+  )
 });
 
 function RegisterPage() {
@@ -23,12 +29,12 @@ function RegisterPage() {
   const [crowdTag, setCrowdTag] = useState("Less Crowded");
   const [aromaTag, setAromaTag] = useState("No Aroma");
 
-  const handleLocPick = (latlng : L.LatLng) => {
+  const handleLocPick = (latlng: L.LatLng) => {
     setStoreLocation(`${latlng.lat}, ${latlng.lng}`);
     setOpenMap(false)
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     const [latStr, lonStr] = storeLocation.replace(/[()]/g, '').split(',');
 
@@ -57,89 +63,129 @@ function RegisterPage() {
   }
 
   return(
-    <main>
-      {
-        openMap && 
-        (
-          <div>
+    <main className="register-page">
+      {/* ── Map picker overlay ── */}
+      {openMap && (
+        <div className="map-overlay">
+          <div className="map-modal">
+            <div className="map-modal-header">
+              <span>📍 Tap to pick a location</span>
+              <button className="map-close-btn" onClick={() => setOpenMap(false)}>✕</button>
+            </div>
             <PickMap onPick={handleLocPick} />
-            <button onClick={() => setOpenMap(false)}> Close </button>
           </div>
-        )
-      }
+        </div>
+      )}
 
-      <div id='regis-form'>
-        <div>
-          <div>Your Store's Name:</div>
+      {/* ── Registration card ── */}
+      <div className="register-card">
+
+        <Link href="/wac" className="back-link">← Back to map</Link>
+
+        {/* Header */}
+        <div className="register-header">
+          <span className="paw-icon">🐾</span>
+          <h1>Register a Spot</h1>
+          <p>Add a cozy new place for the community</p>
+        </div>
+
+        {/* Store Name */}
+        <div className="form-group">
+          <label className="form-label">Store Name</label>
           <input 
-            type='text'
+            type="text"
+            className="form-input"
             value={storeName}
-            onChange={(e) => {setStoreName(e.target.value)}}
-            placeholder='Store Name'
-            autoComplete='off'
-            autoCorrect='off'
-            autoCapitalize='off'
+            onChange={(e) => setStoreName(e.target.value)}
+            placeholder="e.g. Paws & Coffee"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
           />
         </div>
 
-        <div id='location-inp'>
-          <div>Your Store's Location:</div>
-          <input 
-            type='text'
-            value={storeLocation}
-            onChange={(e) => {setStoreLocation(e.target.value)}}
-            placeholder='Location'
-            autoComplete='off'
-            autoCorrect='off'
-            autoCapitalize='off'
-            style={{
-              border: 'none'
-            }}
-          />
-          <button onClick={() => setOpenMap(true)}> Pick </button>
-        </div>
-
-        <div>
-          <div>Your Store's Address:</div>
+        {/* Location */}
+        <div className="form-group">
+          <label className="form-label">Location Coordinates</label>
+          <div className="location-row">
             <input 
-              type='text'
-              value={storeAddress}
-              onChange={(e) => {setStoreAddress(e.target.value)}}
-              placeholder='Store Name'
-              autoComplete='off'
-              autoCorrect='off'
-              autoCapitalize='off'
+              type="text"
+              className="form-input"
+              value={storeLocation}
+              onChange={(e) => setStoreLocation(e.target.value)}
+              placeholder="Pick on map or type lat, lng"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              readOnly
             />
+            <button className="pick-btn" onClick={() => setOpenMap(true)}>
+              📍 Pick
+            </button>
+          </div>
         </div>
 
-        <div>
-          <div>Tags:</div>
-
-          <select title='Sound Tag' onChange={(e) => setSoundTag(e.target.value)}>
-            <option> Quiet </option>
-            <option> Somewhat Quiet </option>
-            <option> Noisy </option>
-          </select>
-
-          <select title='Light Tag' onChange={(e) => setLightTag(e.target.value)}>
-            <option> Dim </option>
-            <option> Medium </option>
-            <option> Bright </option>
-          </select>          
-
-          <select title='Crowd Tag' onChange={(e) => setCrowdTag(e.target.value)}>
-            <option> Less Crowded </option>
-            <option> Mdeium Crowd </option>
-            <option> Generally Crowded </option>
-          </select>
-
-          <select title='Aroma Tag' onChange={(e) => setAromaTag(e.target.value)}>
-            <option> No Aroma </option>
-            <option> Mild Aroma </option>
-            <option> Strong Aroma </option>
-          </select>
+        {/* Address */}
+        <div className="form-group">
+          <label className="form-label">Street Address</label>
+          <input 
+            type="text"
+            className="form-input"
+            value={storeAddress}
+            onChange={(e) => setStoreAddress(e.target.value)}
+            placeholder="e.g. 42 Bandra West, Mumbai"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+          />
         </div>
-        <button onClick={handleSubmit}> Submit </button>
+
+        {/* Tags */}
+        <div className="tags-section">
+          <label className="form-label">Vibe Tags</label>
+          <div className="tags-grid">
+            <div className="tag-group">
+              <span className="tag-label">🔇 Sound</span>
+              <select className="tag-select" title="Sound Tag" value={soundTag} onChange={(e) => setSoundTag(e.target.value)}>
+                <option value="Quiet">Quiet</option>
+                <option value="Somewhat Quiet">Somewhat Quiet</option>
+                <option value="Noisy">Noisy</option>
+              </select>
+            </div>
+
+            <div className="tag-group">
+              <span className="tag-label">💡 Lighting</span>
+              <select className="tag-select" title="Light Tag" value={lightTag} onChange={(e) => setLightTag(e.target.value)}>
+                <option value="Dim">Dim</option>
+                <option value="Medium">Medium</option>
+                <option value="Bright">Bright</option>
+              </select>
+            </div>
+
+            <div className="tag-group">
+              <span className="tag-label">👥 Crowd</span>
+              <select className="tag-select" title="Crowd Tag" value={crowdTag} onChange={(e) => setCrowdTag(e.target.value)}>
+                <option value="Less Crowded">Less Crowded</option>
+                <option value="Medium Crowd">Medium Crowd</option>
+                <option value="Generally Crowded">Generally Crowded</option>
+              </select>
+            </div>
+
+            <div className="tag-group">
+              <span className="tag-label">🌸 Aroma</span>
+              <select className="tag-select" title="Aroma Tag" value={aromaTag} onChange={(e) => setAromaTag(e.target.value)}>
+                <option value="No Aroma">No Aroma</option>
+                <option value="Mild Aroma">Mild Aroma</option>
+                <option value="Strong Aroma">Strong Aroma</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit */}
+        <button className="submit-btn" onClick={handleSubmit}>
+          Register This Spot 🐾
+        </button>
       </div>
     </main>
   )

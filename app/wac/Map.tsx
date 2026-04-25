@@ -16,6 +16,13 @@ if (typeof window !== "undefined") {
 
 import 'leaflet-routing-machine';
 
+const pawIcon = L.divIcon({
+  html: `<div style="font-size: 24px; filter: drop-shadow(0px 4px 8px rgba(100,116,139,0.3)); text-align: center; transition: transform 0.2s; cursor: pointer;">🐾</div>`,
+  className: 'custom-paw-marker',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15] // center anchor for a soft floating droplet/paw feel
+});
+
 function GoToLocation({onMapClick}: { onMapClick: (latlng: L.LatLng) => void }){
   const map = useMap()
   const selectedLocation = useMapStore((s) => s.selectedLocation)
@@ -51,29 +58,47 @@ const getLocation = () => {
   }
 }
 
+import { useRef } from 'react';
+
 function DoRouting({start, end}: { start: L.LatLng | null, end: L.LatLng | null}){
   const map = useMap();
+  const routingControlRef = useRef<any>(null);
 
+  // Initialize routing control exactly once per map
   useEffect(() => {
-    if(!map || !start || !end){
-      return;
-    }
+    if(!map) return;
 
     const routingControl = (L as any).Routing.control({
-      waypoints: [start, end],
+      waypoints: [],
       routeWhileDragging: true,
       position: 'bottomleft',
+      show: false, // Hide instruction panel for calm design
       lineOptions: {
-        styles: [
-          {color: 'blue', weight: 4}
-        ]
+        styles: [{color: '#a5b4fc', weight: 5, opacity: 0.8}]
       }
-    }).addTo(map)
+    }).addTo(map);
+
+    routingControlRef.current = routingControl;
 
     return () => {
-      if(map) map.removeControl(routingControl);
+      try {
+        if(map && routingControlRef.current) {
+          map.removeControl(routingControlRef.current);
+        }
+      } catch (e) {
+        console.warn("Routing machine cleanup:", e);
+      }
     }
-  }, [map, start, end])
+  }, [map]);
+
+  // Update waypoints independently
+  useEffect(() => {
+    if (routingControlRef.current && start && end) {
+      routingControlRef.current.setWaypoints([start, end]);
+    } else if (routingControlRef.current) {
+      routingControlRef.current.setWaypoints([]);
+    }
+  }, [start, end]);
 
   return null;
 }
@@ -97,9 +122,9 @@ function Map() {
   const [mapZoom, setMapZoom] = useState(10);
   const searchResults = useMapStore((s) => s.searchResults);
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
+  const routeEnd = useMapStore((s: any) => s.routeEnd);
 
   const [userLocation, setUserLocation] = useState<L.LatLng | null>(null)
-  const [routeEnd, setRouteEnd] = useState<L.LatLng | null>(null)
 
   useEffect(() => {
     if(navigator.geolocation){
@@ -116,8 +141,7 @@ function Map() {
   }, [])
 
   const handleMapClick = (latlng: L.LatLng) => {
-    setRouteEnd(latlng)
-    console.log("Routing...")
+    // Optional: we leave this to fly to coordinates, but we no longer route automatically
   }
 
   return (
@@ -137,22 +161,17 @@ function Map() {
         <GoToLocation onMapClick={handleMapClick}/>
         <MapClickHandler onMapClick={handleMapClick}/>
 
-        <DoRouting start={userLocation} end={routeEnd} />
+        <DoRouting start={userLocation} end={routeEnd ? L.latLng(routeEnd.lat, routeEnd.lon) : null} />
 
         {searchResults.map((loc: any) => (
           <Marker
             key={loc.id}
             position={[loc.lat, loc.lon]}
+            icon={pawIcon}
             eventHandlers={{
               click: () => setSelectedLocation(loc),
             }}
-          >
-            <Popup>
-              <strong>{loc.name}</strong>
-              <br />
-              <small>{loc.address}</small>
-            </Popup>
-          </Marker>
+          />
         ))}
       </MapContainer>
     </>

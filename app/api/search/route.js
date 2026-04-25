@@ -7,9 +7,22 @@ export async function GET(req) {
     const query = searchParams.get('q')
 
     if (!query) {
-      return NextResponse.json({ error: 'No query' }, { status: 400 })  // fix: dot not comma
+      return NextResponse.json({ error: 'No query' }, { status: 400 })
     }
 
+    // 1. Search our local database first for Verified/Registered stores
+    const localStores = await prisma.location.findMany({
+      where: {
+        isVerified: true,
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { address: { contains: query, mode: 'insensitive' } }
+        ]
+      },
+      take: 4
+    });
+
+    // 2. Fetch from Nominatim (OpenStreetMap)
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=4`,
       { headers: { 'User-Agent': 'WalksAndChill github.com/RiseMantis' } }
@@ -17,11 +30,8 @@ export async function GET(req) {
 
     const results = await res.json();
 
-    if (!results.length) {
-      return NextResponse.json([])  // fix: dot not comma
-    }
-
-    const locations = await Promise.all(
+    // 3. Upsert OSM results to DB to give them a valid ID
+    const osmLocations = await Promise.all(
       results.map(async (r) => {
         return prisma.location.upsert({
           where: { placeId: r.place_id.toString() },
@@ -37,10 +47,20 @@ export async function GET(req) {
       })
     )
 
-    return NextResponse.json(locations)
+    // 4. Combine results: prioritize local registered stores, then append OSM results avoiding duplicates
+    const combined = [...localStores];
+    const localIds = new Set(localStores.map(store => store.id));
+
+    osmLocations.forEach(loc => {
+      if (!localIds.has(loc.id)) {
+        combined.push(loc);
+      }
+    });
+
+    return NextResponse.json(combined);
 
   } catch (error) {
-    console.error('Search API error:', error)  // this will show the real error in your terminal
+    console.error('Search API error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

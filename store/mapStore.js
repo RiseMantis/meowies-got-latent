@@ -10,6 +10,11 @@ export const useMapStore = create((set) => ({
 
   setSelectedLocation: (loc) => set({
     selectedLocation: loc
+  }),
+
+  routeEnd: null,
+  setRouteEnd: (loc) => set({
+    routeEnd: loc
   })
 }));
 

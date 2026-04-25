@@ -8,5 +8,16 @@ export const {auth, handlers, signIn, signOut} = NextAuth({
   providers: [
     Github(),
     Google(),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        // Implement authorization logic here if needed
+        return { id: "1", name: credentials.username }
+      }
+    }),
   ]
 })

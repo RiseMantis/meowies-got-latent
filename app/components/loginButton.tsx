@@ -1,5 +1,5 @@
 "use client";
-import {login, logout, googleIn} from '@/lib/actions';
+import {login, logout, googleIn, credentialsIn} from '@/lib/actions';
 import '@/app/globals.css';
 
 function LoginGoogle() {
@@ -17,8 +17,24 @@ function LoginGoogle() {
   )
 }
 
+function LoginCredentials() {
+  return(
+    <div id="github-btn" onClick={() => credentialsIn()} style={{
+      animation: 'pop-up-3 1.5s ease-in forwards'
+    }}>
+      <div className='btn-content' style={{
+        transform: 'rotate(-45deg)'
+      }}>
+        <div style={{ fontSize: '15px', marginBottom: '3px', display: 'flex' }}>🔑</div>
+        <div> Sign in with Email </div>
+      </div>
+    </div>
+  )
+}
+
 export function LoginGithub() {
   return(
+    <>
     <div id='login-btn'>
       <div id="github-btn" onClick={() => login()}>
         <div className='btn-content'>
@@ -28,5 +44,9 @@ export function LoginGithub() {
       </div>
       <LoginGoogle/>
     </div>
+    <div>
+      <LoginCredentials/>
+    </div>
+    </>
   )
 }

@@ -1,0 +1,30 @@
+.profile-bg {
+  background: radial-gradient(circle at 10% 20%, rgb(255, 237, 213) 0%, rgb(224, 231, 255) 90%);
+  min-height: 100vh;
+  width: 100vw;
+  padding-bottom: 120px; /* space for bottom nav */
+}
+
+/* Hide scrollbar for clean mobile look */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom animated gradient border for profile pic */
+.profile-ring {
+  background: linear-gradient(45deg, #818cf8, #fca5a5, #818cf8);
+  background-size: 200% 200%;
+  animation: gradientRing 3s ease infinite;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+@keyframes gradientRing {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

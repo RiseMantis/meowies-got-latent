@@ -48,12 +48,12 @@ model SensoryReport{
   user User @relation(fields: [userId], references: [id])
 
   locationId String
-  location Location @relation(fields: [locationId], references: [id])
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
-  soundTag String
-  lightTag String
-  aromaTag String
-  crowdTag String
+  soundTag Int
+  lightTag Int
+  aromaTag Int
+  crowdTag Int
 
   confirms Int @default(0)
 }
