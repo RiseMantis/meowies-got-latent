@@ -11,7 +11,7 @@ const andika = Andika({
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen flex flex-col items-center overflow-hidden bg-cover bg-center" style={{ backgroundImage: "url('/bg-calming.png')" }}>
+    <main className="relative min-h-screen flex flex-col items-center overflow-hidden bg-cover bg-center" style={{ backgroundImage: "url('/bg-calming.png')", backgroundSize: "contain"}}>
       {/* Soft overlay to ensure readability */}
       <div className="absolute inset-0 bg-white/30 dark:bg-slate-950/70 backdrop-blur-sm transition-colors duration-500"></div>
       

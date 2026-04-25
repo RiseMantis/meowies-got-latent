@@ -29,6 +29,30 @@ export const {auth, handlers, signIn, signOut} = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // Ensure user exists in database for OAuth providers
+      if (account?.provider !== 'credentials' && user.id) {
+        try {
+          // Upsert user by id to avoid unique constraint violations
+          await prisma.user.upsert({
+            where: { id: user.id },
+            update: {
+              email: user.email || '',
+              name: user.name || profile?.name || user.email?.split('@')[0] || 'User'
+            },
+            create: {
+              id: user.id,
+              email: user.email || '',
+              name: user.name || profile?.name || user.email?.split('@')[0] || 'User'
+            }
+          });
+        } catch (error) {
+          console.error('Error creating/updating user in signIn:', error);
+          // Don't block sign-in if user sync fails - the location register route has fallback logic
+        }
+      }
+      return true;
+    },
     async session({ session, token }) {
       if (token?.sub) {
         session.user.id = token.sub;

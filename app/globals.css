@@ -13,10 +13,6 @@
 body {
   background: rgb(220, 183, 255);
   font-family: Arial, Helvetica, sans-serif;
-  padding-top: 4rem;
-  padding-left: 2rem;
-  padding-right: 2rem;
-  padding-bottom: 4rem;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
