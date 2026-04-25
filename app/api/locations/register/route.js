@@ -7,7 +7,19 @@ export async function POST(req) {
   try{
     const session = await auth()
     // Bypass strict 401 to allow unauthenticated DB testing/usage 
-    const currentUserId = session?.user?.id || undefined;
+    let currentUserId = session?.user?.id || undefined;
+
+    // Verify user exists in database if authenticated
+    if (currentUserId) {
+      const userExists = await prisma.user.findUnique({
+        where: { id: currentUserId }
+      });
+      
+      if (!userExists) {
+        console.warn(`User ${currentUserId} from session not found in database`);
+        currentUserId = undefined; // Clear userId if user doesn't exist
+      }
+    }
 
     const body = await req.json();
     const { id, name, address, lat, lon, sound, light, crowd, aroma } = body;
@@ -25,7 +37,7 @@ export async function POST(req) {
           crowdTag: crowd,
           aromaTag: aroma,
           isVerified: true,
-          ownerId: currentUserId,
+          ...(currentUserId && { ownerId: currentUserId }),
           name: name,
           address: address 
         }
