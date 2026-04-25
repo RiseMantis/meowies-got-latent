@@ -5,10 +5,34 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
     const query = searchParams.get('q')
+    const filters = searchParams.get('filters')
+      ? searchParams.get('filters').split(',').map((filter) => filter.trim().toLowerCase()).filter(Boolean)
+      : [];
 
     if (!query) {
       return NextResponse.json({ error: 'No query' }, { status: 400 })
     }
+
+    const filterFieldMap = {
+      quiet: 'soundTag',
+      aroma: 'aromaTag',
+      crowd: 'crowdTag',
+      lighting: 'lightTag'
+    };
+
+    const filterConditions = filters
+      .map((filter) => {
+        const field = filterFieldMap[filter];
+        if (!field) return null;
+        return {
+          reports: {
+            some: {
+              [field]: { gte: 4 }
+            }
+          }
+        };
+      })
+      .filter(Boolean);
 
     // 1. Search our local database first for Verified/Registered stores
     let localStores = [];
@@ -21,7 +45,8 @@ export async function GET(req) {
           OR: [
             { name: { contains: query, mode: 'insensitive' } },
             { address: { contains: query, mode: 'insensitive' } }
-          ]
+          ],
+          ...(filterConditions.length ? { AND: filterConditions } : {})
         },
         take: 4
       });
@@ -32,18 +57,20 @@ export async function GET(req) {
 
     // 2. Fetch from Nominatim (OpenStreetMap)
     let results = [];
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=4`,
-        { headers: { 'User-Agent': 'WalksAndChill github.com/RiseMantis' } }
-      );
-      if (res.ok) {
-        results = await res.json();
-      } else {
-        console.error('Nominatim search responded with', res.status);
+    if (!filters.length) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=4`,
+          { headers: { 'User-Agent': 'WalksAndChill github.com/RiseMantis' } }
+        );
+        if (res.ok) {
+          results = await res.json();
+        } else {
+          console.error('Nominatim search responded with', res.status);
+        }
+      } catch (err) {
+        console.error('Search OSM fetch failed, returning local results if available:', err);
       }
-    } catch (err) {
-      console.error('Search OSM fetch failed, returning local results if available:', err);
     }
 
     // 3. Upsert OSM results to DB to give them a valid ID when the DB is available

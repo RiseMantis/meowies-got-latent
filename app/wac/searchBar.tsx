@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMapStore } from '@/store/mapStore';
 import { SearchOptions } from './SearchOptions';
-import { Search, Loader2, X } from 'lucide-react';
+import { Search, Loader2, X, SlidersHorizontal } from 'lucide-react';
 
 interface SearchResult {
   address: string;
@@ -15,16 +15,56 @@ interface SearchResult {
   placeId: string;
 }
 
+const filterOptions = [
+  { key: 'quiet', label: 'Quiet', hint: 'Noise 4+' },
+  { key: 'aroma', label: 'Aroma', hint: 'Aroma 4+' },
+  { key: 'crowd', label: 'Crowd', hint: 'Crowd 4+' },
+  { key: 'lighting', label: 'Lighting', hint: 'Lighting 4+' }
+];
+
+const filterConfig: Record<string, { field: string; threshold: number }> = {
+  quiet: { field: 'soundTag', threshold: 4 },
+  aroma: { field: 'aromaTag', threshold: 4 },
+  crowd: { field: 'crowdTag', threshold: 4 },
+  lighting: { field: 'lightTag', threshold: 4 }
+};
+
+type SearchItem = Record<string, string | number | undefined | null>;
+
+interface MapStoreState {
+  setSearchResults: (results: SearchResult[]) => void;
+  activeFilters: string[];
+  toggleFilter: (filter: string) => void;
+  clearFilters: () => void;
+}
+
 function SearchBar() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const setSearchResults = useMapStore((s: any) => s.setSearchResults);
-  const searchResults = useMapStore((s: any) => s.searchResults);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const setSearchResults = useMapStore((s: MapStoreState) => s.setSearchResults);
+  const activeFilters = useMapStore((s: MapStoreState) => s.activeFilters);
+  const toggleFilter = useMapStore((s: MapStoreState) => s.toggleFilter);
+  const clearFilters = useMapStore((s: MapStoreState) => s.clearFilters);
   const [searchData, setSearchData] = useState<SearchResult[]>([]);
   const [isFocused, setIsFocused] = useState(false);
 
-  const handleSearch = async (searchTerm?: string | React.FormEvent, eFormEvent?: React.FormEvent) => {
-    // Determine if the first argument is an event or a string
+  const applyFiltersToItems = useCallback((items: SearchItem[]) => {
+    if (!activeFilters.length) return items;
+
+    return items.filter((item) => {
+      return activeFilters.every((filter) => {
+        const config = filterConfig[filter];
+        if (!config) return true;
+
+        const rawValue = item[config.field];
+        const numericValue = typeof rawValue === 'number' ? rawValue : Number(rawValue);
+        return !Number.isNaN(numericValue) && numericValue >= config.threshold;
+      });
+    });
+  }, [activeFilters]);
+
+  const handleSearch = useCallback(async (searchTerm?: string | React.FormEvent, eFormEvent?: React.FormEvent) => {
     let term = search;
     if (typeof searchTerm === 'string') {
       term = searchTerm;
@@ -39,12 +79,18 @@ function SearchBar() {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(term)}`);
+      const params = new URLSearchParams({ q: term.trim() });
+      if (activeFilters.length) {
+        params.set('filters', activeFilters.join(','));
+      }
+
+      const res = await fetch(`/api/search?${params.toString()}`);
       const data = await res.json();
 
       if (Array.isArray(data)) {
-        setSearchResults(data);
-        setSearchData(data);
+        const filtered = applyFiltersToItems(data);
+        setSearchResults(filtered);
+        setSearchData(filtered);
       } else {
         console.error('API error:', data);
       }
@@ -53,18 +99,16 @@ function SearchBar() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, activeFilters, setSearchResults, applyFiltersToItems]);
 
   // Debounce search input for autocomplete
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      if (search.trim().length >= 2) {
-        handleSearch(search);
-      }
+      handleSearch();
     }, 500); // 500ms debounce
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search]);
+  }, [handleSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -104,6 +148,15 @@ function SearchBar() {
           className="flex-1 min-w-0 bg-transparent border-none outline-none px-3 text-slate-700 dark:text-slate-200 font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500 placeholder:font-normal"
         />
 
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((prev) => !prev)}
+          className="mr-2 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/90 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          Filters
+        </button>
+
         {search && !loading && (
           <button 
             onClick={handleClear}
@@ -124,7 +177,56 @@ function SearchBar() {
             <Search className="w-5 h-5" />
           )}
         </button>
+        {filtersOpen && (
+          <div className="absolute right-0 top-full mt-3 w-52 rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/95 shadow-2xl p-3 backdrop-blur-xl z-50">
+            <div className="flex flex-col gap-2">
+              {filterOptions.map((option) => {
+                const active = activeFilters.includes(option.key);
+                return (
+                  <button
+                    type="button"
+                    key={option.key}
+                    onClick={() => toggleFilter(option.key)}
+                    className={`flex items-center justify-between rounded-2xl px-3 py-2 text-left text-sm transition-all ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                  >
+                    <div>
+                      <div className="font-medium">{option.label}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{option.hint}</div>
+                    </div>
+                    <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${active ? 'bg-white text-indigo-600' : 'bg-slate-300 text-slate-700'}`}>{active ? '✓' : '+'}</span>
+                  </button>
+                );
+              })}
+              {activeFilters.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearFilters();
+                    setFiltersOpen(false);
+                  }}
+                  className="mt-2 rounded-2xl bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-all"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
+
+      {activeFilters.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-1">
+          {activeFilters.map((filter) => {
+            const option = filterOptions.find((item) => item.key === filter);
+            if (!option) return null;
+            return (
+              <span key={filter} className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200 shadow-sm">
+                {option.label}
+              </span>
+            );
+          })}
+        </div>
+      )}
 
       {/* Search Options Dropdown */}
       {searchData.length > 0 && search.length > 0 && (

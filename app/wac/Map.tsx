@@ -2,11 +2,10 @@
 
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import { useMapStore } from '@/store/mapStore'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression, map } from 'leaflet'
 import './ayo.css'
-
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'
 
 if (typeof window !== "undefined") {
@@ -15,6 +14,13 @@ if (typeof window !== "undefined") {
 }
 
 import 'leaflet-routing-machine';
+
+const nearbyIcon2 = L.icon({
+  iconUrl: '/nearbyIcon.png',   // just the public path, no import needed
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+})
 
 const pawIcon = L.divIcon({
   html: `<div style="font-size: 24px; filter: drop-shadow(0px 4px 8px rgba(100,116,139,0.3)); text-align: center; transition: transform 0.2s; cursor: pointer;">🐾</div>`,
@@ -103,7 +109,7 @@ function DoRouting({start, end}: { start: L.LatLng | null, end: L.LatLng | null}
   return null;
 }
 
-function MapClickHandler({onMapClick, onNearbyFetch}: { onMapClick: (latlng: L.LatLng) => void, onNearbyFetch: (places: any[]) => void }) {
+function MapClickHandler({onMapClick, onNearbyFetch, activeFilters}: { onMapClick: (latlng: L.LatLng) => void, onNearbyFetch: (places: any[]) => void, activeFilters: string[] }) {
   useMapEvents({
     click: async (e) => {
       const lat = e.latlng.lat;
@@ -134,7 +140,11 @@ function MapClickHandler({onMapClick, onNearbyFetch}: { onMapClick: (latlng: L.L
 
       // Fetch nearby locations
       try {
-        const res = await fetch(`/api/locations/nearby?lat=${lat}&lon=${lon}`);
+        const params = new URLSearchParams({ lat: String(lat), lon: String(lon) });
+        if (activeFilters.length) {
+          params.set('filters', activeFilters.join(','));
+        }
+        const res = await fetch(`/api/locations/nearby?${params.toString()}`);
         if (res.ok) {
           const places = await res.json();
           onNearbyFetch(places);
@@ -154,12 +164,43 @@ const nearbyIcon = L.divIcon({
   iconAnchor: [12, 12]
 });
 
+const filterLabelMap: Record<string, string> = {
+  quiet: 'Quiet',
+  aroma: 'Aroma',
+  crowd: 'Crowd',
+  lighting: 'Lighting'
+};
+
+const createRatingMarkerIcon = (place: any, activeFilters: string[]) => {
+  const lines = activeFilters.map((filter) => {
+    const label = filterLabelMap[filter] || filter;
+    const value = place.avgRatings?.[filter] ?? place[filter];
+    const formatted = typeof value === 'number' ? value.toFixed(1) : value ? String(value) : '—';
+
+    return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;line-height:1.2;padding:0 4px;margin-top:2px;">` +
+      `<span style="color:#334155;">${label}</span>` +
+      `<span style="font-weight:700;color:#0f172a;">${formatted}</span>` +
+      `</div>`;
+  }).join('');
+
+  return L.divIcon({
+    html: `<div style="background:#ffffff;border:1px solid rgba(148,163,184,0.35);border-radius:18px;box-shadow:0 10px 24px rgba(15,23,42,0.14);padding:8px 10px;min-width:92px;text-align:left;">` +
+      `<div style="font-size:14px;line-height:1;text-align:center;margin-bottom:6px;">🐾</div>` +
+      `${lines}` +
+      `</div>`,
+    className: 'custom-filter-marker',
+    iconSize: [110, 28 + activeFilters.length * 18],
+    iconAnchor: [55, 18 + activeFilters.length * 18]
+  });
+};
+
 function Map() {
   const [mapCenter, setMapCenter] = useState<LatLngExpression>([19.076, 72.877])
   const [mapZoom, setMapZoom] = useState(10);
   const searchResults = useMapStore((s) => s.searchResults);
   const setSelectedLocation = useMapStore((s) => s.setSelectedLocation);
   const routeEnd = useMapStore((s: any) => s.routeEnd);
+  const activeFilters = useMapStore((s: any) => s.activeFilters);
 
   const [userLocation, setUserLocation] = useState<L.LatLng | null>(null)
   const [nearbyPlaces, setNearbyPlaces] = useState<any[]>([]);
@@ -177,6 +218,28 @@ function Map() {
       )
     }
   }, [])
+
+  const fetchNearbyPlaces = useCallback(async (lat: number, lon: number) => {
+    try {
+      const params = new URLSearchParams({ lat: String(lat), lon: String(lon) });
+      if (activeFilters.length) {
+        params.set('filters', activeFilters.join(','));
+      }
+      const res = await fetch(`/api/locations/nearby?${params.toString()}`);
+      if (res.ok) {
+        const places = await res.json();
+        setNearbyPlaces(places);
+      }
+    } catch (err) {
+      console.error('Nearby fetch error:', err);
+    }
+  }, [activeFilters]);
+
+  useEffect(() => {
+    if (userLocation) {
+      fetchNearbyPlaces(userLocation.lat, userLocation.lng);
+    }
+  }, [userLocation, fetchNearbyPlaces]);
 
   const handleMapClick = (latlng: L.LatLng) => {
     // Optional: we leave this to fly to coordinates, but we no longer route automatically
@@ -201,7 +264,7 @@ function Map() {
         />
 
         <GoToLocation onMapClick={handleMapClick}/>
-        <MapClickHandler onMapClick={handleMapClick} onNearbyFetch={handleNearbyFetch}/>
+        <MapClickHandler onMapClick={handleMapClick} onNearbyFetch={handleNearbyFetch} activeFilters={activeFilters} />
 
         <DoRouting start={userLocation} end={routeEnd ? L.latLng(routeEnd.lat, routeEnd.lon) : null} />
 
@@ -216,21 +279,29 @@ function Map() {
           />
         ))}
 
-        {nearbyPlaces.map((place: any, idx: number) => (
-          <Marker
-            key={`nearby-${place.placeId || place.id || idx}`}
-            position={[place.lat, place.lon]}
-            icon={place.isRegistered ? pawIcon : nearbyIcon}
-            eventHandlers={{
-              click: () => setSelectedLocation(place),
-            }}
-          >
-            <Popup>
-              <b style={{ fontSize: '12px' }}>{place.name}</b>
-              {place.isRegistered && <span style={{ fontSize: '9px', color: '#22c55e', marginLeft: '4px' }}>✓ Registered</span>}
-            </Popup>
-          </Marker>
-        ))}
+        {console.log('nearbyPlaces:', nearbyPlaces)}
+
+        {nearbyPlaces.map((place: any, idx: number) => {
+          const placeIcon = activeFilters.length && place.avgRatings
+            ? createRatingMarkerIcon(place, activeFilters)
+            : nearbyIcon2;
+
+          return (
+            <Marker
+              key={`nearby-${place.placeId || place.id || idx}`}
+              position={[place.lat, place.lon]}
+              icon={placeIcon}
+              eventHandlers={{
+                click: () => setSelectedLocation(place),
+              }}
+            >
+              <Popup>
+                <b style={{ fontSize: '12px' }}>{place.name}</b>
+                {place.isRegistered && <span style={{ fontSize: '9px', color: '#22c55e', marginLeft: '4px' }}>✓ Registered</span>}
+              </Popup>
+            </Marker>
+          )
+        })}
       </MapContainer>
     </>
   )

@@ -80,21 +80,10 @@ export default function LocationDetailDrawer() {
                 <Navigation className="w-5 h-5" />
                 Go Here
               </button>
-              <button className="flex-1 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 border border-slate-100 dark:border-slate-700 py-3 px-4 rounded-2xl font-medium transition-all shadow-sm flex items-center justify-center gap-2">
-                <Info className="w-5 h-5 text-slate-400 dark:text-slate-500" />
-                Details
-              </button>
             </div>
 
             {/* Sensory Reviews Section */}
             <SensoryReviews locationId={selectedLocation.id} />
-
-            {/* Soft decorative elements to reinforce calm/pet theme */}
-            <div className="mt-8 p-5 bg-gradient-to-br from-warm-sand/50 to-soft-peach/30 dark:from-slate-800/50 dark:to-slate-700/30 rounded-3xl border border-white/60 dark:border-slate-600/30 transition-colors">
-              <p className="text-sm text-slate-600 dark:text-slate-400 italic text-center">
-                “A perfect spot for a calm afternoon stroll.” 🐾
-              </p>
-            </div>
             
           </div>
         </motion.div>
