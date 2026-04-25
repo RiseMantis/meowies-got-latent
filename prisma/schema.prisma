@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Location{
+  id String @id @default(cuid())
+  name String
+  address String
+  lat Float
+  lon Float
+  placeId String? @unique
+  createdAt DateTime @default(now())
+
+  isVerified  Boolean @default(false) // True if registered by an owner
+  ownerId     String?
+  owner       User?    @relation("RegisteredLocations", fields: [ownerId], references: [id])
+
+  // defined by the owner
+  soundTag    String?
+  lightTag    String?
+  aromaTag    String?
+  crowdTag    String?
+
+  reports SensoryReport[]
+}
+
+model User{
+  id String @id @default(cuid())
+  name String @unique
+  email String
+  createdAt DateTime @default(now())
+  reports SensoryReport[]
+  registeredLocations Location[] @relation("RegisteredLocations")
+  conversations Conversation[]
+  preferences UserPreferences?
+}
+
+// defined by other users/visitors
+model SensoryReport{
+  id String @id @default(cuid())
+  
+  createdAt DateTime @default(now())
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  locationId String
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  soundTag Int
+  lightTag Int
+  aromaTag Int
+  crowdTag Int
+
+  confirms Int @default(0)
+}
+
+model Conversation {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ConversationMessage[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConversationMessage {
+  id String @id @default(cuid())
+  conversationId String
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role String // "user" or "assistant"
+  content String
+  createdAt DateTime @default(now())
+}
+
+model UserPreferences {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredSoundLevel Int? // 1-5 scale
+  preferredLighting Int?
+  preferredCrowd Int?
+  preferredAroma Int?
+  mood String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

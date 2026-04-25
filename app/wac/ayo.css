@@ -1,0 +1,81 @@
+@import "leaflet/dist/leaflet.css";
+@import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+
+body{
+  padding: 0px;
+  background: none;
+  overflow: hidden;
+  background: var(--color-calm-greige);
+}
+
+#myMap{
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+.leaflet-marker-pane {
+  z-index: 600 !important;
+}
+
+/* Search UI is now styled with Tailwind CSS in components */
+
+.leaflet-routing-container {
+  width: clamp(200px, 40vw, 400px) !important;
+  overflow:hidden !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0px 8px 32px rgba(100, 116, 139, 0.1) !important;
+  color: var(--color-slate-blue) !important;
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 24px !important;
+  font-family: sans-serif;
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* ── Dark Mode overrides for map page ── */
+.dark body {
+  background: #0f172a;
+}
+
+.dark .leaflet-routing-container {
+  background-color: rgba(15, 23, 42, 0.9) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(51, 65, 85, 0.6) !important;
+  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ── Compact click popup ── */
+.compact-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.15);
+  font-family: 'Outfit', sans-serif;
+}
+
+.compact-popup .leaflet-popup-content {
+  margin: 6px 4px;
+  line-height: 1.4;
+}
+
+.compact-popup .leaflet-popup-tip {
+  box-shadow: none;
+}
+
+/* ── Nearby marker icon reset ── */
+.custom-nearby-marker,
+.custom-paw-marker {
+  background: none !important;
+  border: none !important;
+}
+
+/* ── Dark mode: popup ── */
+.dark .leaflet-popup-content-wrapper {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .leaflet-popup-tip {
+  background: #1e293b !important;
+}
