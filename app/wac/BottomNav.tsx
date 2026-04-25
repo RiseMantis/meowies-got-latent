@@ -1,16 +1,23 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PlusCircle, MessageCircleHeart, UserRound, Map } from 'lucide-react';
+import { PlusCircle, UserRound, Map } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+const AgentIcon = ({ className }: { className?: string }) => (
+  <Image
+    src="/w.png"
+    alt="Ask AI"
+    width={28}
+    height={28}
+    className={`object-contain rounded-[10px] ${className}`}
+  />
+);
 
 export default function BottomNav() {
   const pathname = usePathname();
-
-const AgentIcon = ({ className }: { className?: string }) => (
-  <img src="/w.png" alt="Ask AI" className={`object-contain ${className}`} style={{borderRadius: "10px"}}/>
-);
 
   const navItems = [
     {
@@ -25,7 +32,7 @@ const AgentIcon = ({ className }: { className?: string }) => (
     },
     {
       label: 'Ask Meow',
-      href: '#', // Placeholder for chatbot route
+      href: '/wac/chat',
       icon: AgentIcon,
     },
     {
@@ -43,25 +50,25 @@ const AgentIcon = ({ className }: { className?: string }) => (
           const Icon = item.icon;
 
           return (
-            <Link 
+            <Link
               key={item.label}
               href={item.href}
               className="relative flex flex-col items-center justify-center p-2 rounded-xl transition-transform active:scale-90"
             >
               {isActive && (
-                <motion.div 
+                <motion.div
                   layoutId="bottom-nav-indicator"
                   className="absolute inset-0 bg-[#a5b4fc]/20 dark:bg-indigo-500/20 rounded-2xl"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}
-              <Icon 
+              <Icon
                 className={`w-6 h-6 mb-1 z-10 transition-colors ${
                   isActive ? 'text-[#818cf8] dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'
-                }`} 
+                }`}
                 strokeWidth={isActive ? 2.5 : 2}
               />
-              <span 
+              <span
                 className={`text-[10px] font-semibold z-10 transition-colors ${
                   isActive ? 'text-[#818cf8] dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'
                 }`}

@@ -2,31 +2,23 @@
 import {login, logout, googleIn, credentialsIn} from '@/lib/actions';
 import '@/app/globals.css';
 
-function LoginGoogle() {
+export function LoginGoogle() {
   return(
-    <div id="github-btn" onClick={() => googleIn()} style={{
-      animation: 'pop-up-2 1.5s ease-in forwards'
-    }}>
-      <div className='btn-content' style={{
-        transform: 'rotate(-45deg)'
-      }}>
-        <div id='google-logo'></div>
-        <div> Sign in with Google </div>
+    <div className="rhombus-btn glass-panel group" onClick={() => googleIn()} style={{ animationDelay: '0.2s' }}>
+      <div className='btn-content'>
+        <div className="google-logo"></div>
+        <div className="text-center font-medium text-sm">Google</div>
       </div>
     </div>
   )
 }
 
-function LoginCredentials() {
+export function LoginCredentials() {
   return(
-    <div id="github-btn" onClick={() => credentialsIn()} style={{
-      animation: 'pop-up-3 1.5s ease-in forwards'
-    }}>
-      <div className='btn-content' style={{
-        transform: 'rotate(-45deg)'
-      }}>
-        <div style={{ fontSize: '15px', marginBottom: '3px', display: 'flex' }}>🔑</div>
-        <div> Sign in with Email </div>
+    <div className="rhombus-btn glass-panel group" onClick={() => credentialsIn()} style={{ animationDelay: '0.4s' }}>
+      <div className='btn-content'>
+        <div className="text-3xl mb-1 flex items-center justify-center">🔑</div>
+        <div className="text-center font-medium text-sm">Email</div>
       </div>
     </div>
   )
@@ -34,19 +26,11 @@ function LoginCredentials() {
 
 export function LoginGithub() {
   return(
-    <>
-    <div id='login-btn'>
-      <div id="github-btn" onClick={() => login()}>
-        <div className='btn-content'>
-          <div id='gitlogo'></div>
-          <div> Sign in with GitHub </div>
-        </div>
+    <div className="rhombus-btn glass-panel group" onClick={() => login()} style={{ animationDelay: '0s' }}>
+      <div className='btn-content'>
+        <div className="git-logo"></div>
+        <div className="text-center font-medium text-sm">GitHub</div>
       </div>
-      <LoginGoogle/>
     </div>
-    <div>
-      <LoginCredentials/>
-    </div>
-    </>
   )
 }

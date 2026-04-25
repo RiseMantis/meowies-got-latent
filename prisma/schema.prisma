@@ -36,6 +36,8 @@ model User{
   createdAt DateTime @default(now())
   reports SensoryReport[]
   registeredLocations Location[] @relation("RegisteredLocations")
+  conversations Conversation[]
+  preferences UserPreferences?
 }
 
 // defined by other users/visitors
@@ -56,4 +58,35 @@ model SensoryReport{
   crowdTag Int
 
   confirms Int @default(0)
+}
+
+model Conversation {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ConversationMessage[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConversationMessage {
+  id String @id @default(cuid())
+  conversationId String
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role String // "user" or "assistant"
+  content String
+  createdAt DateTime @default(now())
+}
+
+model UserPreferences {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredSoundLevel Int? // 1-5 scale
+  preferredLighting Int?
+  preferredCrowd Int?
+  preferredAroma Int?
+  mood String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
