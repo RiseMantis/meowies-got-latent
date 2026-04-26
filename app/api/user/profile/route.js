@@ -11,12 +11,18 @@ export async function GET(req) {
 
     const email = session.user.email || `${session.user.name}@placeholder.com`;
     const name = session.user.name || "Unknown User";
+    const id = session.user.id;
+
+    if (!id) {
+      return NextResponse.json({ error: "User ID not found in session" }, { status: 400 });
+    }
 
     // Find or create the user in the database based on session
     const user = await prisma.user.upsert({
-      where: { name: name },
-      update: { email: email },
+      where: { id: id },
+      update: { name: name, email: email },
       create: {
+        id: id,
         name: name,
         email: email
       },

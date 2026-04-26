@@ -50,11 +50,19 @@ export async function POST(req, { params }) {
 
     // Upsert the user to ensure they exist in our database
     const email = session.user.email || `${session.user.name}@placeholder.com`;
+    const name = session.user.name || "Unknown User";
+    const id = session.user.id;
+
+    if (!id) {
+      return NextResponse.json({ error: "User ID not found in session" }, { status: 400 });
+    }
+
     const user = await prisma.user.upsert({
-      where: { name: session.user.name || "Unknown User" },
-      update: { email: email },
+      where: { id: id },
+      update: { name: name, email: email },
       create: {
-        name: session.user.name || "Unknown User",
+        id: id,
+        name: name,
         email: email
       }
     });

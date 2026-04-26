@@ -157,6 +157,9 @@ export default function ChatPage() {
           <ChatInput onSendMessage={sendMessage} disabled={isLoading} />
         </div>
       </div>
+      <div className='flex flex-col h-6'></div>
+      <div className='flex flex-col h-6'></div>
+      <div className='flex flex-col h-6'></div>
     </div>
   );
 }

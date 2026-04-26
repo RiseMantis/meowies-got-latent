@@ -178,7 +178,7 @@ function SearchBar() {
           )}
         </button>
         {filtersOpen && (
-          <div className="absolute right-0 top-full mt-3 w-52 rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/95 shadow-2xl p-3 backdrop-blur-xl z-50">
+          <div className="absolute right-0 top-full mt-3 w-52 rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/95 shadow-2xl p-3 backdrop-blur-xl" style={{ zIndex: '1000'}}>
             <div className="flex flex-col gap-2">
               {filterOptions.map((option) => {
                 const active = activeFilters.includes(option.key);
