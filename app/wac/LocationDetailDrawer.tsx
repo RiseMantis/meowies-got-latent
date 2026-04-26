@@ -3,6 +3,7 @@ import { useMapStore } from '@/store/mapStore';
 import { X, MapPin, Navigation, Info, Heart } from 'lucide-react';
 
 import SensoryReviews from './SensoryReviews';
+import SensoryTrendsChart from './SensoryTrendsChart';
 
 export default function LocationDetailDrawer() {
   const selectedLocation = useMapStore((s: any) => s.selectedLocation);
@@ -43,7 +44,9 @@ export default function LocationDetailDrawer() {
             md:rounded-[32px] md:border
             
             p-6 flex flex-col gap-6 overflow-y-auto transition-colors
-          ">
+          "
+          style={{ overflowX:'hidden'}}
+          >
 
             <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-2 md:hidden" />
             
@@ -81,6 +84,9 @@ export default function LocationDetailDrawer() {
                 Go Here
               </button>
             </div>
+
+            {/* Predictive Trends Chart */}
+            <SensoryTrendsChart locationId={selectedLocation.id} />
 
             {/* Sensory Reviews Section */}
             <SensoryReviews locationId={selectedLocation.id} />

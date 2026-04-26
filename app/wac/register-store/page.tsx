@@ -186,6 +186,7 @@ function RegisterPage() {
         <button className="submit-btn" onClick={handleSubmit}>
           Register This Spot 🐾
         </button>
+        <div className='flex flex-col h-5'></div>
       </div>
     </main>
   )
